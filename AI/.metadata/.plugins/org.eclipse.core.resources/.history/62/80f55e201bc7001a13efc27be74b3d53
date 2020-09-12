@@ -1,0 +1,9 @@
+package userInput;
+
+public class getInput {
+
+	public getInput() {
+		// TODO Auto-generated constructor stub
+	}
+
+}

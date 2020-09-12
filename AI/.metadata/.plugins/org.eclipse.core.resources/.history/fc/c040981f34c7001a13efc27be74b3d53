@@ -1,0 +1,11 @@
+import java.sql.*;
+
+public class connectToDB {
+
+	private Connection con;
+	public connectToDB() {
+		// TODO Auto-generated constructor stub
+		
+	}
+
+}

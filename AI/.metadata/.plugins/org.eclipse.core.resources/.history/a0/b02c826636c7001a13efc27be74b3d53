@@ -1,0 +1,20 @@
+import java.sql.*;
+
+
+
+//connection object
+public class connectToDB {
+	private Connection con;
+	private String 
+	public connectToDB() {
+		// TODO Auto-generated constructor stub
+		Class.forName();
+	}
+	
+	//get connection object
+	public Connection getConectionDB()
+	{
+		return this.con;
+	}
+	
+}

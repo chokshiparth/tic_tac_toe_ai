@@ -1,0 +1,7 @@
+INDEX VERSION 1.4+E:\TIC_TOC_TOE_AI\AI\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+3888477475.index
+1514750419.index
+326199985.index
+3217391321.index
+3530526172.index
+2379145671.index

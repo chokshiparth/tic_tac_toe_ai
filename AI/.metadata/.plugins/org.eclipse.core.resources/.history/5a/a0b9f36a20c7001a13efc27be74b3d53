@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+  <display-name>tictactoe</display-name>
+  <servlet></servlet>
+  <Servlet-name>ui</Servlet-name>
+  <Servlet-class>UI.userInput</Servlet-class>
+  
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+  </welcome-file-list>
+</web-app>

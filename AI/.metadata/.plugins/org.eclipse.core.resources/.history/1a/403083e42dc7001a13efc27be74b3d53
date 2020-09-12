@@ -1,0 +1,8 @@
+
+public class connectToDB {
+
+	public connectToDB() {
+		// TODO Auto-generated constructor stub
+	}
+
+}

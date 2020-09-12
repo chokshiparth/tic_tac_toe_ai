@@ -1,0 +1,14 @@
+package userInput;
+
+
+//we are taking user input here for further process
+
+public class getInput {
+
+	private int userInput;
+	
+	public getInput() {
+		// TODO Auto-generated constructor stub
+	}
+
+}

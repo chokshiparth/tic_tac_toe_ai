@@ -1,0 +1,39 @@
+import java.sql.*;
+
+//connection object
+public class connectToDB {
+	
+	private Connection con;
+	private String className;
+	private String dbName;
+	private String passwd;
+	private String userName;
+	
+	//default constructor
+	public connectToDB() {
+		// TODO Auto-generated constructor stub
+		this.con=null;
+		this.className=null;
+		this.dburl=null;
+		this.passwd=null;
+		this.userName=null;
+	}
+	
+	//build connection with database
+	private void buildConnection()
+	{
+		this.className="com.mysql.cj.jdbc.Driver";
+		this.userName="root";
+		this.passwd="";
+		this.dbName="tictactoe";
+		this.con=DriverManager.getConnection(dburl,);
+	}
+	
+	//get connection object
+	public Connection getConectionDB()
+	{
+		this.buildConnection();
+		return this.con;
+	}
+	
+}
