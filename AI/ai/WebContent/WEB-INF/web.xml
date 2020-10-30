@@ -8,7 +8,7 @@
   
   <servlet>
   	<servlet-name>ui</servlet-name>
-  	<servlet-class>userInterface</servlet-class>
+  	<servlet-class>UserInterface</servlet-class>
   </servlet>
   <servlet-mapping>
   	<servlet-name>ui</servlet-name>
@@ -17,7 +17,7 @@
   
   <servlet>
   	<servlet-name>userval</servlet-name>
-  	<servlet-class>userInterface</servlet-class>
+  	<servlet-class>UserInterface</servlet-class>
   </servlet>
   <servlet-mapping>
   	<servlet-name>userval</servlet-name>

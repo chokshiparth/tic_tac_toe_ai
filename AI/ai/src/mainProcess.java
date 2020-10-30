@@ -3,7 +3,7 @@
  * bot's and user's move probability and to make move map of user and bot.
  * 
  * 1. Here forWhom=1 for user.
- * 		and forWhom = 2 for bot.
+ * 	 and forWhom = 2 for bot.
  * */
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -11,22 +11,22 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 
-public abstract class mainProcess {
+public abstract class MainProcess {
 private final static String DBNAME = "tictoctoe_ai";
 private final static String GOALSTATE = "goal_state";
 private final static String USERTABLE = "user_move";
-private final static String BOATABLE = "boat_move";
+private final static String BOTABLE = "bot_move";
 private static Statement stmt;
 
 private String botInput;
 private String userInput;
 private static int userWinningProb;
 private static int botWinningProb;
-private connectToDB conDB;
+private ConnectToDB conDB;
 private static Connection con=null;
 
-	public mainProcess()throws SQLException {
-		this.conDB = new connectToDB();
+	public MainProcess()throws SQLException {
+		this.conDB = new ConnectToDB();
 		con=this.conDB.getConectionDB();
 		stmt = con.createStatement();
 		userWinningProb=0;
@@ -96,7 +96,7 @@ private static Connection con=null;
 		String userMoveTable = "CREATE TABLE "+USERTABLE+" (move VARCHAR(1),state VARCHAR(5))";
 		
 		//create BotMoveTable
-		String botMoveTable = "CREATE TABLE "+BOATABLE+" (move VARCHAR(1),state VARCHAR(5))";
+		String botMoveTable = "CREATE TABLE "+BOTABLE+" (move VARCHAR(1),state VARCHAR(5))";
 		
 		stmt.executeUpdate(userMoveTable);
 		stmt.executeUpdate(botMoveTable);
@@ -121,8 +121,8 @@ private static Connection con=null;
 			rs = stmt.executeQuery(query);
 		}
 		else if(forWhom==2) {
-			System.out.println("*BOAT* : "+this.botInput);
-			query = "SELECT state FROM "+BOATABLE+" WHERE move NOT LIKE '"+this.botInput+"'";
+			System.out.println("*BOT* : "+this.botInput);
+			query = "SELECT state FROM "+BOTABLE+" WHERE move NOT LIKE '"+this.botInput+"'";
 			prob=botWinningProb;
 			rs = stmt.executeQuery(query);
 		}
@@ -142,7 +142,7 @@ private static Connection con=null;
 
 	/*
 	 * ****************************************************************************************************
-	 *  insert user and boat moves and its possibilities into user_move_table and boat_move_table
+	 *  insert user and bot moves and its possibilities into user_move_table and bot_move_table
 	 * ***************************************************************************************************
 	 * */
 	private void insertMove(String input,int forWhom)throws SQLException {
@@ -161,9 +161,9 @@ private static Connection con=null;
 			//insert into user table
 			if(forWhom==1)
 				query = "INSERT INTO "+USERTABLE+" VALUES('"+this.userInput+"','"+(String)itr.next()+"')";
-			//insert into boat table
+			//insert into bot table
 			else
-				query = "INSERT INTO "+BOATABLE+" VALUES('"+this.botInput+"','"+(String)itr.next()+"')";
+				query = "INSERT INTO "+BOTABLE+" VALUES('"+this.botInput+"','"+(String)itr.next()+"')";
 			stmt.executeUpdate(query);
 		}
 		
@@ -171,13 +171,13 @@ private static Connection con=null;
 
 	/*
 	 * ****************************************************************************************************
-	 *  Find all patterns from goal_state, user_move and boat_move which are impossible to make for
-	 *  user as well as boat.
+	 *  Find all patterns from goal_state, user_move and bot_move which are impossible to make for
+	 *  user as well as bot.
 	 * ****************************************************************************************************
 	 * */
 	public void deletePattenrns()throws SQLException {
 		List<String> patterns = new LinkedList<String>();
-		String query = "SELECT "+USERTABLE+".state FROM "+USERTABLE+" INNER JOIN "+BOATABLE+" ON "+USERTABLE+".state = "+BOATABLE+".state";
+		String query = "SELECT "+USERTABLE+".state FROM "+USERTABLE+" INNER JOIN "+BOTABLE+" ON "+USERTABLE+".state = "+BOTABLE+".state";
 		ResultSet rs = stmt.executeQuery(query);
 		while(rs.next())
 		{
@@ -198,7 +198,7 @@ private static Connection con=null;
 		{
 			String value = (String)itr.next();
 			stmt.executeUpdate("DELETE FROM "+USERTABLE+" WHERE state LIKE '"+value+"'");
-			stmt.executeUpdate("DELETE FROM "+BOATABLE+" WHERE state LIKE '"+value+"'");
+			stmt.executeUpdate("DELETE FROM "+BOTABLE+" WHERE state LIKE '"+value+"'");
 			stmt.executeUpdate("DELETE FROM "+GOALSTATE+" WHERE state LIKE '"+value+"'");
 		}
 	}
@@ -225,7 +225,7 @@ private static Connection con=null;
 	
 	/*
 	 * ****************************************************************************************************
-	 *  set boat input
+	 *  set bot input
 	 * ***************************************************************************************************
 	 * */
 	public void setBotInput(String botPos) {

@@ -18,14 +18,14 @@ import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-public class boatMove extends mainProcess{
+public class BoatMove extends mainProcess{
 	
 	//private final static data members
 	private final static String DBNAME = "tictoctoe_ai";
 	private final static String USERTABLE = "user_move";
 	private final static String BOATABLE = "boat_move";
 	
-	private connectToDB conDB;
+	private ConnectToDB conDB;
 	private static Connection con=null;
 	
 	//private static data members
@@ -44,7 +44,7 @@ public class boatMove extends mainProcess{
 	
 	//constructor
 	boatMove()throws SQLException {
-		conDB= new connectToDB();
+		conDB= new ConnectToDB();
 		con = conDB.getConectionDB();
 		this.query=null;
 		this.userInput=null;
@@ -132,7 +132,7 @@ public class boatMove extends mainProcess{
 		//after 2nd move
 		else {
 			//if boat wining probability is higher 
-			if(boatWiningProb>=userWiningProb) {
+			if(boatWiningProb>userWiningProb) {
 				if(boatExpectedMoves.size()==0 || checkBoatPatternStatus()) 
 					makeBoatPattern();
 				botMovePos=boatExpectedMoves.get(0);
@@ -140,7 +140,7 @@ public class boatMove extends mainProcess{
 			}
 			
 			//if user wining probability is higher
-			else if(userWiningProb>boatWiningProb) {	
+			else if(userWiningProb>=boatWiningProb) {	
 				int size = expectedMoves.size();
 				
 				if(size>=1) {

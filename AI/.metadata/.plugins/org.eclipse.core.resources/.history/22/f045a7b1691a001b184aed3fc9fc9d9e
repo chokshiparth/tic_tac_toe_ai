@@ -1,0 +1,234 @@
+/*
+ * It is abstract class which have methods that will be used to find out
+ * bot's and user's move probability and to make move map of user and bot.
+ * 
+ * 1. Here forWhom=1 for user.
+ * 		and forWhom = 2 for bot.
+ * */
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.*;
+
+public abstract class MainProcess {
+private final static String DBNAME = "tictoctoe_ai";
+private final static String GOALSTATE = "goal_state";
+private final static String USERTABLE = "user_move";
+private final static String BOATABLE = "bot_move";
+private static Statement stmt;
+
+private String botInput;
+private String userInput;
+private static int userWinningProb;
+private static int botWinningProb;
+private ConnectToDB conDB;
+private static Connection con=null;
+
+	public MainProcess()throws SQLException {
+		this.conDB = new ConnectToDB();
+		con=this.conDB.getConectionDB();
+		stmt = con.createStatement();
+		userWinningProb=0;
+		botWinningProb=0;
+	}
+	
+	/*
+	 * ****************************************************************************************************
+	 *  put values in hash map
+	 * ***************************************************************************************************
+	 * */
+	private List<String> findSet(String move)throws SQLException {	
+		stmt.executeUpdate("USE "+this.DBNAME);
+		String query = "SELECT * from "+GOALSTATE;
+		ResultSet rs = stmt.executeQuery(query);
+		List<String> setList = new LinkedList<String>();
+		while(rs.next())
+		{
+			String setValue = rs.getString("state");
+			if(setValue.indexOf(move)!=-1)
+				setList.add(setValue);
+		}
+		return setList;
+	}
+	
+	/*
+	 * ****************************************************************************************************
+	 *  this method insert data into GOAL_STATE table
+	 * ***************************************************************************************************
+	 * */
+	private void insertState()throws SQLException {
+		String query = null;
+		query = "INSERT INTO goal_state(state) VALUES('1 2 3')";
+		stmt.addBatch(query);
+		query = "INSERT INTO goal_state(state) VALUES('1 5 9')";
+		stmt.addBatch(query);
+		query = "INSERT INTO goal_state(state) VALUES('1 4 7')";
+		stmt.addBatch(query);
+		query = "INSERT INTO goal_state(state) VALUES('2 5 8')";
+		stmt.addBatch(query);
+		query = "INSERT INTO goal_state(state) VALUES('3 5 7')";
+		stmt.addBatch(query);
+		query = "INSERT INTO goal_state(state) VALUES('3 6 9')";
+		stmt.addBatch(query);
+		query = "INSERT INTO goal_state(state) VALUES('4 5 6')";
+		stmt.addBatch(query);
+		query = "INSERT INTO goal_state(state) VALUES('7 8 9')";
+		stmt.addBatch(query);
+		stmt.executeBatch();
+	}
+	
+	/*
+	 * ****************************************************************************************************
+	 *  create Database and tables
+	 * ***************************************************************************************************
+	 * */
+	public void MakeDb()throws SQLException {
+		String query = "CREATE DATABASE "+DBNAME;
+		stmt.executeUpdate(query);
+		stmt.executeUpdate("USE "+DBNAME);
+		
+		//create goal_state table
+		String createTable = "CREATE TABLE "+GOALSTATE+" (state VARCHAR(5));";
+		stmt.executeUpdate(createTable);
+		
+		//create userMoveTable
+		String userMoveTable = "CREATE TABLE "+USERTABLE+" (move VARCHAR(1),state VARCHAR(5))";
+		
+		//create BotMoveTable
+		String botMoveTable = "CREATE TABLE "+BOATABLE+" (move VARCHAR(1),state VARCHAR(5))";
+		
+		stmt.executeUpdate(userMoveTable);
+		stmt.executeUpdate(botMoveTable);
+		
+		//insert data in GOAL_STATE table
+		insertState();
+	}
+	
+	/*
+	 * ****************************************************************************************************
+	 *  find probability for user and computer
+	 * ***************************************************************************************************
+	 * */
+	public int findProb(int forWhom)throws SQLException {
+		ResultSet rs = null;
+		String query=null;
+		int prob=-1;
+		//find for whom we are finding probability
+		if(forWhom==1) {
+			query = "SELECT state FROM "+USERTABLE+" WHERE move NOT LIKE '"+this.userInput+"'";
+			prob=userWinningProb;
+			rs = stmt.executeQuery(query);
+		}
+		else if(forWhom==2) {
+			System.out.println("*BOAT* : "+this.botInput);
+			query = "SELECT state FROM "+BOATABLE+" WHERE move NOT LIKE '"+this.botInput+"'";
+			prob=botWinningProb;
+			rs = stmt.executeQuery(query);
+		}
+		if(rs!=null)
+		{
+			while(rs.next())
+			{
+				String state = rs.getString("state");
+				if(state.indexOf(userInput)!=-1)
+					prob++;
+			}
+		}
+		else
+			prob=-1;
+		return prob;
+	}
+
+	/*
+	 * ****************************************************************************************************
+	 *  insert user and boat moves and its possibilities into user_move_table and boat_move_table
+	 * ***************************************************************************************************
+	 * */
+	private void insertMove(String input,int forWhom)throws SQLException {
+		
+		String query=null;
+		List<String> combinations = new LinkedList<String>();
+		
+		//find possible combinations on the basis of input
+		combinations=this.findSet(input);
+		Iterator itr = combinations.iterator();
+		stmt = con.createStatement();
+		
+		//set database
+		stmt.executeUpdate("USE "+DBNAME);
+		while(itr.hasNext()) {
+			//insert into user table
+			if(forWhom==1)
+				query = "INSERT INTO "+USERTABLE+" VALUES('"+this.userInput+"','"+(String)itr.next()+"')";
+			//insert into boat table
+			else
+				query = "INSERT INTO "+BOATABLE+" VALUES('"+this.botInput+"','"+(String)itr.next()+"')";
+			stmt.executeUpdate(query);
+		}
+		
+	}
+
+	/*
+	 * ****************************************************************************************************
+	 *  Find all patterns from goal_state, user_move and boat_move which are impossible to make for
+	 *  user as well as boat.
+	 * ****************************************************************************************************
+	 * */
+	public void deletePattenrns()throws SQLException {
+		List<String> patterns = new LinkedList<String>();
+		String query = "SELECT "+USERTABLE+".state FROM "+USERTABLE+" INNER JOIN "+BOATABLE+" ON "+USERTABLE+".state = "+BOATABLE+".state";
+		ResultSet rs = stmt.executeQuery(query);
+		while(rs.next())
+		{
+			patterns.add(rs.getString("state"));
+		}
+		rs.close();
+		deleteFindPatterns(patterns);
+	}
+	/*
+	 * *****************************************************************************************************
+	 * Delete found patterns
+	 * *****************************************************************************************************
+	 * */
+	private void deleteFindPatterns(List<String> patterns)throws SQLException
+	{
+		Iterator itr = patterns.iterator();
+		while(itr.hasNext())
+		{
+			String value = (String)itr.next();
+			stmt.executeUpdate("DELETE FROM "+USERTABLE+" WHERE state LIKE '"+value+"'");
+			stmt.executeUpdate("DELETE FROM "+BOATABLE+" WHERE state LIKE '"+value+"'");
+			stmt.executeUpdate("DELETE FROM "+GOALSTATE+" WHERE state LIKE '"+value+"'");
+		}
+	}
+	/*
+	 * ****************************************************************************************************
+	 *  make map for user move
+	 * ***************************************************************************************************
+	 * */
+	public void makeMoveMap(String input,int forWhom)throws SQLException {
+		if(forWhom==1)
+			insertMove(input,1);
+		else
+			insertMove(input,2);
+	}
+
+	/*
+	 * ****************************************************************************************************
+	 *  set user input
+	 * ***************************************************************************************************
+	 * */
+	public void setUserInput(String userInput) {
+			this.userInput=userInput;
+	}
+	
+	/*
+	 * ****************************************************************************************************
+	 *  set boat input
+	 * ***************************************************************************************************
+	 * */
+	public void setBotInput(String botPos) {
+		this.botInput=botPos;
+	}
+}

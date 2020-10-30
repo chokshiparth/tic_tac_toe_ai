@@ -11,26 +11,27 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/userInterface")
-public class userInterface extends HttpServlet {
+@WebServlet("/UserInterface")
+public class UserInterface extends HttpServlet {
+ 
 	private static final long serialVersionUID = 1L;
-    private static int flag=0;
+	private static int flag=0;
 	private String userInput;
-    private boatMove bm;
+    private BotMove bm;
 	private char board[];
-	private int boatMovePos;
+	private int botMovePos;
 	private int userWiningProb;
-	private int boatWiningProb;
+	private int botWiningProb;
 	
 	/*
 	 * ****************************************************************************************************
 	 *  constructor
 	 * ***************************************************************************************************
 	 **/
-    public userInterface()throws SQLException {
+    public UserInterface()throws SQLException {
         super();
         this.userInput=null;
-        this.bm = new boatMove();
+        this.bm = new BotMove();
         char j='1';
         this.board = new char[9];
         for(int i=0;i<9;i++) {
@@ -90,7 +91,7 @@ public class userInterface extends HttpServlet {
     		this.board[move]=sign;
     	}
     	else if(sign=='X') {
-    		int move = this.boatMovePos;
+    		int move = this.botMovePos;
     		this.board[move]=sign;
     	}
     }
@@ -106,7 +107,7 @@ public class userInterface extends HttpServlet {
 			
 			try {
 				this.putValue('O');
-				bm = new boatMove();
+				bm = new BotMove();
 				if(flag==0)
 				{
 					bm.MakeDb();
@@ -114,18 +115,16 @@ public class userInterface extends HttpServlet {
 				}
 				this.bm.setUserMove(userInput);
 				this.bm.makeBotMove();
-				this.boatMovePos = this.bm.getBotMove();
+				this.botMovePos = this.bm.getBotMove();
 				this.userWiningProb = bm.getUserWinProb();
-				this.boatWiningProb = bm.getBoatWinProb();
-				if(userWiningProb>boatWiningProb) {
+				this.botWiningProb = bm.getBotWinProb();
+				this.putValue('X');
+				if(userWiningProb > botWiningProb && userWiningProb != 1) {
 						response.getWriter().println("<H1><i>USER WON</i></H1>");
 					}
-				else if(userWiningProb<boatWiningProb) {
-						this.putValue('X');
+				else if(userWiningProb<botWiningProb && botWiningProb != 1) {
 						response.getWriter().println("<H1><i>COMPUTER WON</i></H1>");
 					}
-				else
-					this.putValue('X');
 			}
 			catch(Exception e) {
 				for(int i=0;i<e.getStackTrace().length;i++) {
